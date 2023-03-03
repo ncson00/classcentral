@@ -1,5 +1,5 @@
 import time
-import glob
+import argparse
 
 from googletrans import Translator
 from bs4 import BeautifulSoup, NavigableString, Comment
@@ -23,7 +23,7 @@ def translate_nested_tag(tag):
     if type(tag) == Comment or tag.name in BLACKLIST: pass
     else:
         if len(tag.contents) == 1: translate_tag(tag)
-        elif (len(tag.contents) > 1) & (len(tag.contents) <= 9):
+        elif len(tag.contents) > 1:
             for i in range(len(tag.contents)):
                 element = tag.contents[i]
                 if type(element) == NavigableString:
@@ -37,30 +37,32 @@ def translate_nested_tag(tag):
         else: pass
 
 
-def main():
+def main(file_dir):
 
-    start = time.time()
-    file_done = 0
+    html_doc = open(file_dir, mode='r')
+    soup = BeautifulSoup(html_doc, 'lxml')
 
-    for file_dir in glob.glob("**/*.html", recursive=True):
-    # file_dir = 'www.classcentral.com/login.html'
-        html_doc = open(file_dir, mode='r')
-        soup = BeautifulSoup(html_doc, 'lxml')
+    tags = [tag.name for tag in soup.body.find_all()]
+    tag_names = list(set(tags).difference(set(BLACKLIST)))
 
-        tags = [tag.name for tag in soup.body.find_all()]
-        tag_names = list(set(tags).difference(set(BLACKLIST)))
+    for tag_name in tag_names:
+        for tag in soup.body.find_all(tag_name):
+            translate_tag(tag)
 
-        for tag_name in tag_names:
-            for tag in soup.body.find_all(tag_name):
-                translate_nested_tag(tag)
+    with open(file_dir, 'w') as f:
+        f.write(str(soup))
 
-        with open(file_dir, 'w') as f:
-            f.write(soup)
-
-        file_done += 1
-        print('INFO - Took {} secs. Processed successfully {} file(s)'.format(time.time() - start, file_done))
-        
 
 if __name__ == '__main__':
 
-    main()
+    parser = argparse.ArgumentParser()
+    # Adding optional argument
+    parser.add_argument("-d", "--file_dir", help="HTML file directory")
+
+    args = parser.parse_args()
+    if not args.file_dir:
+        raise IOError("File directory must be specify from arguments!!!")
+
+    start = time.time()
+    main(args.file_dir)
+    print('INFO - Took {} secs'.format(time.time() - start))
