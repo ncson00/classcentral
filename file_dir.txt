@@ -1,12 +1,7 @@
-www.classcentral.com/universities.html
-www.classcentral.com/institutions.html
-www.classcentral.com/about.html
-www.classcentral.com/login.html
-www.classcentral.com/subjects.html
-www.classcentral.com/lists.html
 www.classcentral.com/rankings.html
 www.classcentral.com/contact.html
 www.classcentral.com/providers.html
+www.classcentral.com/universities.html
 www.classcentral.com/s/index.html
 www.classcentral.com/move-item/index.html
 www.classcentral.com/provider/swayam.html
